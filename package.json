@@ -1,0 +1,35 @@
+{
+    "author": "moi",
+    "dependencies": {},
+    "keywords": [],
+    "name": "weather",
+    "pebble": {
+        "displayName": "weather",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/musically.png",
+                    "name": "IMAGE_SPLASH",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt",
+            "chalk",
+            "diorite",
+            "emery"
+        ],
+        "uuid": "20b1d1d1-178a-40d1-8b9b-a596f2ae13a4",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.0.0"
+}
