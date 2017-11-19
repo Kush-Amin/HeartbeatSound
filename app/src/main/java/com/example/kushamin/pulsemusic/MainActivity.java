@@ -22,11 +22,14 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import kaaes.spotify.webapi.android.*;
 import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.ArtistsCursorPager;
+import kaaes.spotify.webapi.android.models.AudioFeaturesTrack;
 import kaaes.spotify.webapi.android.models.Category;
 import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.Playlist;
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements
     SpotifyApi api = new SpotifyApi();
     SpotifyService spotify = api.getService();
     final UUID appUuid = UUID.fromString("20b1d1d1-178a-40d1-8b9b-a596f2ae13a4");
+    private float danceability;
     //boolean connected = PebbleKit.isWatchConnected(getApplicationContext());
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
                 REDIRECT_URI);
-        builder.setScopes(new String[]{"user-read-private", "streaming","user-follow-read"});
+        builder.setScopes(new String[]{"user-read-private", "streaming","user-follow-read", "playlist-modify-public", "playlist-modify-private"});
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
@@ -242,23 +246,24 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        spotify.createPlaylist("first", null, new Callback<Playlist>() {
-            @Override
-            public void success(Playlist playlist, Response response) {
-                Log.d("Category Success", playlist.href);
-            }
 
-            @Override
-            public void failure(RetrofitError error) {
-                Log.d("Category Failure", error.toString());
+        spotify.getTrackAudioFeatures("features", new Callback<AudioFeaturesTrack>() {
+                    @Override
+                    public void success(AudioFeaturesTrack audioFeaturesTrack, Response response) {
+                        Log.d("Feature Success", audioFeaturesTrack.toString());
+                        danceability = audioFeaturesTrack.danceability;
 
-            }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        Log.d("category Fail", error.toString());
+
+                    }
         });
 
 
-
-
-        mPlayer.playUri(null, "spotify:track:7GhIk7Il098yCjg4BQjzvb", 0, 0);
+                mPlayer.playUri(null, "spotify:track:7GhIk7Il098yCjg4BQjzvb", 0, 0);
     }
 
     @Override
