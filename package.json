@@ -6,7 +6,9 @@
     "pebble": {
         "displayName": "weather",
         "enableMultiJS": true,
-        "messageKeys": [],
+        "messageKeys": [
+            "TestKey"
+        ],
         "projectType": "native",
         "resources": {
             "media": [
