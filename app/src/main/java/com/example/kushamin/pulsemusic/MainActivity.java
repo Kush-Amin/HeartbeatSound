@@ -27,7 +27,9 @@ import java.util.UUID;
 import kaaes.spotify.webapi.android.*;
 import kaaes.spotify.webapi.android.models.Album;
 import kaaes.spotify.webapi.android.models.ArtistsCursorPager;
+import kaaes.spotify.webapi.android.models.Category;
 import kaaes.spotify.webapi.android.models.Pager;
+import kaaes.spotify.webapi.android.models.Playlist;
 import kaaes.spotify.webapi.android.models.SavedTrack;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -226,6 +228,34 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d("Album failure", error.toString());
             }
         });
+
+        spotify.getCategory("chill", null, new Callback<Category>() {
+            @Override
+            public void success(Category category, Response response) {
+                Log.d("Category Success", category.href);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Category Fail", error.toString());
+
+            }
+        });
+
+        spotify.createPlaylist("first", null, new Callback<Playlist>() {
+            @Override
+            public void success(Playlist playlist, Response response) {
+                Log.d("Category Success", playlist.href);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Category Failure", error.toString());
+
+            }
+        });
+
+
 
 
         mPlayer.playUri(null, "spotify:track:7GhIk7Il098yCjg4BQjzvb", 0, 0);
