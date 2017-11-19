@@ -32,6 +32,7 @@ import kaaes.spotify.webapi.android.models.SavedTrack;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.http.QueryMap;
 
 public class MainActivity extends AppCompatActivity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback{
@@ -40,9 +41,10 @@ public class MainActivity extends AppCompatActivity implements
     private static final String REDIRECT_URI = "heartcustomprotocol://callback";
     private Response savedTracks;
     private String favArtists;
-    final UUID appUuid = UUID.fromString("20b1d1d1-178a-40d1-8b9b-a596f2ae13a4");
     SpotifyApi api = new SpotifyApi();
-    boolean connected = PebbleKit.isWatchConnected(getApplicationContext());
+    SpotifyService spotify = api.getService();
+    final UUID appUuid = UUID.fromString("20b1d1d1-178a-40d1-8b9b-a596f2ae13a4");
+    //boolean connected = PebbleKit.isWatchConnected(getApplicationContext());
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
     // Most (but not all) of the Spotify Web API endpoints require authorisation.
@@ -79,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements
 
         // Most (but not all) of the Spotify Web API endpoints require authorisation.
         // If you know you'll only use the ones that don't require authorisation you can skip this step
-        api.setAccessToken("myAccessToken");
 
 
+        /*
         // Create a new dictionary
         PebbleDictionary dict = new PebbleDictionary();
         // The key representing a contact name is being transmitted
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements
         final int AppKeyAge = 1;
 
         // Get data from the app
-        final String contactName = getContact();
+        //final String contactName = getContact();
         final int age = getAge();
 
         // Add data to the dictionary
@@ -98,23 +100,9 @@ public class MainActivity extends AppCompatActivity implements
 
         // Send the dictionary
         PebbleKit.sendDataToPebble(getApplicationContext(), appUuid, dict);
-        SpotifyService spotify = api.getService();
+        */
 
 
-
-        //This is busted and important
-        spotify.getFollowedArtists(new SpotifyCallback<ArtistsCursorPager>() {
-            @Override
-            public void success(ArtistsCursorPager artistsCursorPager, Response response) {
-                favArtists = response.getUrl();
-            }
-
-            @Override
-            public void failure(SpotifyError spotifyError) {
-
-            }
-
-        });
 
         spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new Callback<Album>() {
             @Override
@@ -141,8 +129,6 @@ public class MainActivity extends AppCompatActivity implements
                  //handle error
             }
         });
-
-
     }
 
     @Override
@@ -151,21 +137,25 @@ public class MainActivity extends AppCompatActivity implements
 
         // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
-            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            final AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+
+
                     @Override
                     public void onInitialized(SpotifyPlayer spotifyPlayer) {
                         mPlayer = spotifyPlayer;
                         mPlayer.addConnectionStateCallback(MainActivity.this);
                         mPlayer.addNotificationCallback(MainActivity.this);
+                        api.setAccessToken(response.getAccessToken());
                     }
 
                     @Override
                     public void onError(Throwable throwable) {
                         Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
                     }
+
                 });
             }
         }
@@ -180,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements
         PebbleKit.registerReceivedDataHandler(getApplicationContext(), dataReceiver);
     }
 
+    /*
     @Override
     public void receiveData(Context context, int transaction_id,
                             PebbleDictionary dict) {
@@ -190,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements
             int age = ageValue.intValue();
         }
     }
+    */
 
     @Override
     protected void onDestroy() {
@@ -219,7 +211,23 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoggedIn() {
+
+
         Log.d("MainActivity", "User logged in");
+        //This is not busted and important
+        spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new SpotifyCallback<Album>() {
+            @Override
+            public void success(Album album, Response response) {
+                Log.d("Album success", album.name);
+            }
+
+            @Override
+            public void failure(SpotifyError error) {
+                Log.d("Album failure", error.toString());
+            }
+        });
+
+
         mPlayer.playUri(null, "spotify:track:7GhIk7Il098yCjg4BQjzvb", 0, 0);
     }
 
