@@ -4,7 +4,9 @@
 
 Window *mainWindow;
 MenuLayer *mainMenuLayer;
-
+void case2() {
+  return;
+}
 uint16_t menu_get_num_sections_callback(MenuLayer *menu_layer, void *data) {
  return 2;
 }
@@ -12,10 +14,10 @@ uint16_t menu_get_num_sections_callback(MenuLayer *menu_layer, void *data) {
 uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
   switch(section_index){
     case 0:
-      return 3;
+      return 4;
     case 1:
       return 1;
-     case 3:
+     case 2:
       return 1;
      case 4:
       return 1;
@@ -66,20 +68,52 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 }
 }
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-	error_window_show("Hello There!");
-  DictionaryIterator *iter;
-  app_message_outbox_begin(&iter);
-   
-  if(iter == NULL) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Iter is null! Refusing to send");
-    return;
-  }
-  dict_write_uint16(iter, 0, 713);
-  dict_write_end(iter);
-  app_message_outbox_send();
-  
+   DictionaryIterator *iter;
+   app_message_outbox_begin(&iter);
+  switch(cell_index->section){
+    
+      case 0:
+        switch(cell_index->row) {
+    case 0:
+
+      app_message_outbox_begin(&iter);
+      if(iter == NULL) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Iter is null! Refusing to send");
+      }
+      
+      dict_write_uint16(iter, 10000, 713);
+      dict_write_end(iter);
+      app_message_outbox_send();
+      break;
+      }
+    case 1:
+
+      app_message_outbox_begin(&iter);
+      if(iter == NULL) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Iter is null! Refusing to send");
+      dict_write_uint16(iter, 10001, 713);
+      dict_write_end(iter);
+      app_message_outbox_send();
+      break;
+      }
+    case 2:
+      app_message_outbox_begin(&iter);
+      if(iter == NULL) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Iter is null! Refusing to send");
+        dict_write_uint16(iter, 10002, 713);
+        case2();
+      dict_write_end(iter);
+      app_message_outbox_send();
+      break;
+      }
+     
+    case 3:
+      error_window_create();
+     
+    break;
 }
-void process_tuple(Tuple *t){
+}
+void process_tupl(Tuple *t){
     int key = t->key;
     int value = t->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Got key %d with value %d", key, value);
@@ -88,17 +122,16 @@ void process_tuple(Tuple *t){
 void message_inbox(DictionaryIterator *iter, void *context){
     Tuple *t = dict_read_first(iter);
     if(t){
-        process_tuple(t);
+        process_tupl(t);
     }
     while(t != NULL){
         t = dict_read_next(iter);
         if(t){
-            process_tuple(t);
+            process_tupl(t);
         }
     }
 }
-
-void message_inbox_dropped(AppMessageResult reason, void *context){
+void message_inbox_drop(AppMessageResult reason, void *context){
     APP_LOG(APP_LOG_LEVEL_INFO, "Message dropped, reason %d.", reason);
 }
 //void menu_layer_set_normal_colors(MenuLayer * menu_layer, GColor background, GColor foreground) {
@@ -106,7 +139,7 @@ void message_inbox_dropped(AppMessageResult reason, void *context){
   
 //}
 
-void setup_menu_layer(Window *window) {
+void setup_men_layer(Window *window) {
 	Layer *window_layer = window_get_root_layer(window);
     
     mainMenuLayer = menu_layer_create(GRect(0, 0, 144, 168));
@@ -127,10 +160,10 @@ void setup_menu_layer(Window *window) {
 }
 
 void main_window_load(Window *window){
- setup_menu_layer(window);
+ setup_men_layer(window);
   
  app_message_register_inbox_received(message_inbox);
-  app_message_register_inbox_dropped(message_inbox_dropped);
+  app_message_register_inbox_dropped(message_inbox_drop);
  app_message_open(256, 256);
   
 }

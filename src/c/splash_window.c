@@ -23,7 +23,7 @@ void splash_window_load(Window *window){
   layer_add_child(window_layer, text_layer_get_layer(splashImageTitle));
   
 }
-
+//hkjhkjh
 void splash_window_unload(Window *window){
   gbitmap_destroy(splashImage);
   bitmap_layer_destroy(splashImageLayer);
