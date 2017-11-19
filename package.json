@@ -7,7 +7,7 @@
         "displayName": "weather",
         "enableMultiJS": true,
         "messageKeys": [
-            "TestKey"
+            "testkey"
         ],
         "projectType": "native",
         "resources": {

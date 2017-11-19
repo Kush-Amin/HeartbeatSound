@@ -4,7 +4,7 @@ Pebble.addEventListener("ready", function(e) {
 
 
 Pebble.addEventListener("appmessage", function(e) {
-  console.log("Got testkey with valye" + e.payload.testkey);
+  console.log("Got testkey with value" + e.payload.testkey);
   var object = {
     testkey: 0, 
   };
