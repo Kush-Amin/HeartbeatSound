@@ -67,6 +67,39 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 }
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
 	error_window_show("Hello There!");
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+   
+  if(iter == NULL) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Iter is null! Refusing to send");
+    return;
+  }
+  dict_write_uint16(iter, 0, 713);
+  dict_write_end(iter);
+  app_message_outbox_send();
+  
+}
+void process_tuple(Tuple *t){
+    int key = t->key;
+    int value = t->value->int32;
+    APP_LOG(APP_LOG_LEVEL_INFO, "Got key %d with value %d", key, value);
+}
+
+void message_inbox(DictionaryIterator *iter, void *context){
+    Tuple *t = dict_read_first(iter);
+    if(t){
+        process_tuple(t);
+    }
+    while(t != NULL){
+        t = dict_read_next(iter);
+        if(t){
+            process_tuple(t);
+        }
+    }
+}
+
+void message_inbox_dropped(AppMessageResult reason, void *context){
+    APP_LOG(APP_LOG_LEVEL_INFO, "Message dropped, reason %d.", reason);
 }
 //void menu_layer_set_normal_colors(MenuLayer * menu_layer, GColor background, GColor foreground) {
     
@@ -96,7 +129,9 @@ void setup_menu_layer(Window *window) {
 void main_window_load(Window *window){
  setup_menu_layer(window);
   
- 
+ app_message_register_inbox_received(message_inbox);
+  app_message_register_inbox_dropped(message_inbox_dropped);
+ app_message_open(256, 256);
   
 }
 
